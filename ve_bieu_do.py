@@ -58,6 +58,7 @@ sns.lineplot(
 plt.plot([1, 10], [1, 10], 'k--', label='Ideal', linewidth=1.8)
 plt.title('Speedup OpenMP', fontsize=14, fontweight='bold')
 plt.ylabel('Speedup (x)')
+plt.xlabel("Processes")
 plt.xticks(range(1, 11))
 plt.savefig('bieu_do_speedup_omp.png')
 
@@ -85,4 +86,5 @@ plt.plot([1, 10], [1, 10], 'k--', label='Ideal', linewidth=1.8)
 plt.title('Speedup MPI (Apple M4)', fontsize=14, fontweight='bold')
 plt.xticks(range(1, 11))
 plt.ylabel("Speedup (x)")
+plt.xlabel("Processes")
 plt.savefig('bieu_do_speedup_mpi.png')

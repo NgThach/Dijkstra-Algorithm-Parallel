@@ -85,7 +85,7 @@ def ve_bieu_do_cot_so_sanh():
     # Vẽ biểu đồ cột
     ax = sns.barplot(data=df_compare, x='Nodes', y='Time', hue='Type', palette=['#ff9999', '#66b3ff'], edgecolor='black')
     
-    plt.title('Đối đầu trực tiếp: Tuần tự vs Song song tối ưu', fontsize=14, fontweight='bold')
+    plt.title('So sánh thời gian thực thi tuần tự và song song', fontsize=14, fontweight='bold')
     plt.ylabel('Thời gian (Giây) - Thấp hơn là tốt hơn')
     plt.xlabel('Kích thước đồ thị (Số đỉnh)')
     
