@@ -55,8 +55,8 @@ sns.lineplot(
     linewidth=2.8
 )
 
-plt.plot([1, 10], [1, 10], 'k--', label='Ideal', linewidth=1.8)
-plt.title('Speedup OpenMP (Apple M4)', fontsize=14, fontweight='bold')
+# plt.plot([1, 10], [1, 10], 'k--', label='Ideal', linewidth=1.8)
+plt.title('Speedup OpenMP', fontsize=14, fontweight='bold')
 plt.ylabel('Speedup (x)')
 plt.xticks(range(1, 11))
 plt.savefig('bieu_do_speedup_omp.png')
