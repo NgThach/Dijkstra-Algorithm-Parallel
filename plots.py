@@ -11,11 +11,11 @@ except:
     print("Lỗi: Không tìm thấy file ket_qua_full.csv")
     sys.exit()
 
-# Cấu hình giao diện
+# Cấu hình giao diện chung
 sns.set_theme(style="whitegrid")
 plt.rcParams.update({'font.size': 12})
 
-# Hàm vẽ biểu đồ cột cho một mức Node cụ thể
+# Hàm vẽ biểu đồ cột đa năng
 def ve_bieu_do_cot(n_val, filename):
     plt.figure(figsize=(14, 7))
     
@@ -23,45 +23,58 @@ def ve_bieu_do_cot(n_val, filename):
     subset = df[df['Nodes'] == n_val].copy()
     
     if subset.empty:
+        print(f"Không có dữ liệu cho N={n_val}")
         return
 
-    # Vẽ biểu đồ cột nhóm (Grouped Bar Chart)
-    # x = Số luồng, y = Thời gian, hue = Phương pháp (để so sánh màu)
+    # Vẽ biểu đồ cột nhóm
     ax = sns.barplot(data=subset, x='Threads', y='Time', hue='Method', 
                      palette="muted", edgecolor="black", linewidth=1)
 
-    plt.title(f'So sánh Thời gian chạy tại N={n_val} (Thấp hơn là Tốt hơn)', 
+    # Tiêu đề thông minh: Cảnh báo nếu N nhỏ
+    if n_val <= 1000:
+        msg = "(Lưu ý: Overhead cao -> Càng nhiều luồng càng chậm!)"
+    else:
+        msg = "(Thấp hơn là Tốt hơn)"
+
+    plt.title(f'So sánh Thời gian chạy tại N={n_val} {msg}', 
               fontsize=16, fontweight='bold', pad=20)
     plt.ylabel('Thời gian (Giây)', fontsize=13)
     plt.xlabel('Số luồng (Threads/Processes)', fontsize=13)
-    plt.legend(title='Phương pháp', loc='upper right')
     
-    # --- THÊM NHÃN SỐ LIỆU LÊN ĐẦU CỘT ---
-    # Đoạn này giúp hiện số giây cụ thể trên đầu mỗi cột
+    # Đặt Legend ở góc trên trái để tránh che mất cột dữ liệu (thường cao bên phải ở N nhỏ)
+    plt.legend(title='Phương pháp', loc='upper left')
+    
+    # --- THÊM NHÃN SỐ LIỆU ---
     for container in ax.containers:
-        ax.bar_label(container, fmt='%.2f', padding=3, fontsize=10)
+        # Nếu N nhỏ (chạy cực nhanh), hiển thị 4 số lẻ để thấy sự khác biệt
+        # Nếu N lớn, chỉ cần 2 số lẻ cho gọn
+        fmt_str = '%.4f' if n_val <= 1000 else '%.2f'
+        
+        # Xoay chữ 90 độ nếu N nhỏ (để số không bị đè lên nhau vì cột thấp)
+        rot = 90 if n_val <= 1000 else 0
+        
+        ax.bar_label(container, fmt=fmt_str, padding=3, fontsize=10, rotation=rot)
 
-    # Thêm lưới ngang để dễ gióng
     plt.grid(axis='y', linestyle='--', alpha=0.7)
-    
     plt.tight_layout()
     plt.savefig(filename, dpi=300)
     print(f"Đã vẽ xong: {filename}")
 
 # --- THỰC HIỆN VẼ ---
 
-# 1. Vẽ cho trường hợp lớn nhất (N=100,000) - Quan trọng nhất
-ve_bieu_do_cot(100000, 'bieu_do_cot_100k.png')
+# 1. Vòng lặp vẽ TẤT CẢ các mức Node
+ds_node = [100, 1000, 10000, 50000, 100000]
 
-# 2. Vẽ cho trường hợp trung bình (N=50,000)
-ve_bieu_do_cot(50000, 'bieu_do_cot_50k.png')
+print("--- Đang vẽ biểu đồ cột ---")
+for n in ds_node:
+    ve_bieu_do_cot(n, f'bieu_do_cot_{n}.png')
 
-# 3. Vẽ biểu đồ so sánh Hiệu quả (Speedup) dạng cột tại N=100,000
+# 2. Vẽ biểu đồ Speedup tại N=100,000 (như cũ)
+print("--- Đang vẽ biểu đồ Speedup ---")
 plt.figure(figsize=(14, 7))
 subset_100k = df[df['Nodes'] == 100000].copy()
 subset_100k['Speedup'] = 0.0
 
-# Tính Speedup
 for method in ['OpenMP', 'MPI']:
     try:
         base = subset_100k[(subset_100k['Method'] == method) & (subset_100k['Threads'] == 1)]['Time'].values[0]
@@ -82,4 +95,4 @@ for container in ax2.containers:
 
 plt.tight_layout()
 plt.savefig('bieu_do_cot_speedup.png', dpi=300)
-print("Đã vẽ xong: bieu_do_cot_speedup.png")
+print("HOÀN TẤT! Đã vẽ xong tất cả biểu đồ.")
